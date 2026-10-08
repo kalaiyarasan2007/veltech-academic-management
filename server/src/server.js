@@ -14,18 +14,17 @@ import subjectRoutes from './routes/subjects.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS - allow Vercel frontend + local dev
-const allowedOrigins = [
-  'https://veltech-academic-management.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173',
-];
-
+// CORS - allow all Vercel deployments + local dev
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.some(o => origin.startsWith(o))) {
+    // Allow any veltech-academic-management Vercel deployment
+    if (origin.includes('veltech-academic-management') && origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    // Allow localhost for local dev
+    if (origin.startsWith('http://localhost')) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
