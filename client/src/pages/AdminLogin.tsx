@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Mail, AlertCircle, Loader2, GraduationCap, Building2 } from 'lucide-react';
 import { AdminUser } from '../types';
+import { fetchApi } from '../api';
 
 interface AdminLoginProps {
   onLoginSuccess: (user: AdminUser, token: string) => void;
@@ -23,16 +24,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password })
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Authentication failed. Please check credentials.');
-      }
+      const data = await fetchApi<{ token: string; user: AdminUser; message: string }>(
+        '/auth/login',
+        {
+          method: 'POST',
+          body: JSON.stringify({ email: email.trim(), password })
+        }
+      );
 
       // Store only the JWT authentication token, never the password!
       localStorage.setItem('token', data.token);
@@ -40,7 +38,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
       onLoginSuccess(data.user, data.token);
     } catch (err: any) {
-      setError(err.message || 'Authentication error');
+      setError(err.message || 'Authentication failed. Please check credentials.');
     } finally {
       setLoading(false);
     }
