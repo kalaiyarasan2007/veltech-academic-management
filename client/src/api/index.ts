@@ -1,4 +1,5 @@
-const API_BASE = ((import.meta as any)?.env?.VITE_API_URL || 'https://veltech-academic-management.onrender.com').replace(/\/+$/, '') + '/api';
+export const BACKEND_URL = ((import.meta as any)?.env?.VITE_API_URL || 'https://veltech-academic-management.onrender.com').replace(/\/+$/, '');
+const API_BASE = BACKEND_URL + '/api';
 
 export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('token');

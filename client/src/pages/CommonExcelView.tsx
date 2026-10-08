@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileSpreadsheet, Download, Eye, RefreshCw, CheckCircle2, AlertCircle, Info, Database } from 'lucide-react';
-import { fetchApi } from '../api';
+import { fetchApi, BACKEND_URL } from '../api';
 import { ExcelViewer } from '../components/ExcelViewer';
 
 export const CommonExcelView: React.FC = () => {
@@ -34,7 +34,7 @@ export const CommonExcelView: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/excel/common/export', {
+      const res = await fetch(`${BACKEND_URL}/api/excel/common/export`, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         }

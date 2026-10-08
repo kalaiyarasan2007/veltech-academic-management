@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BACKEND_URL } from './api';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { AdminLogin } from './pages/AdminLogin';
@@ -71,7 +72,7 @@ export const App: React.FC = () => {
     localStorage.removeItem('admin_user');
     setAdminUser(null);
     setTabHistory(['dashboard']);
-    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    fetch(`${BACKEND_URL}/api/auth/logout`, { method: 'POST' }).catch(() => {});
   };
 
   if (isAuthChecking) {

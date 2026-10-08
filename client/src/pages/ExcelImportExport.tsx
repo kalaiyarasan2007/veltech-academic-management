@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileUp, Download, Eye, CheckCircle, AlertTriangle, FileSpreadsheet, FileText } from 'lucide-react';
-import { fetchApi } from '../api';
+import { fetchApi, BACKEND_URL } from '../api';
 import { ExcelViewer } from '../components/ExcelViewer';
 import { triggerExcelDownload, triggerOriginalExcelDownload } from '../utils/download';
 
@@ -52,7 +52,7 @@ export const ExcelImportExport: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/excel/import', {
+      const res = await fetch(`${BACKEND_URL}/api/excel/import`, {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
