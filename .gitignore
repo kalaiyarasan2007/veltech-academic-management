@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build outputs
+client/dist/
+dist/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Temporary / Scratch test files
+__pycache__/
+*.pyc
+test_export*.xlsx
+stress_test*.xlsx
+test_common*.xlsx
+test_formula*.xlsx
+verify_*.xlsx
+
+# System & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
