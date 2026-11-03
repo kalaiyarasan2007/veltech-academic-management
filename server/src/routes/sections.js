@@ -158,4 +158,64 @@ router.patch('/:id/toggle-status', requireAdmin, (req, res) => {
   }
 });
 
+// DELETE section (admin only, blocks if has students)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const sections = db.getTable('sections');
+    const students = db.getTable('students');
+
+    const idx = sections.findIndex(s => s.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Section not found' });
+
+    const sec = sections[idx];
+    const secStudents = students.filter(s => s.section_id === sec.id || s.section === sec.section_code);
+    if (secStudents.length > 0) {
+      return res.status(400).json({ error: `Cannot delete section "${sec.section_code}": it has ${secStudents.length} enrolled student(s). Remove or reassign students first.` });
+    }
+
+    sections.splice(idx, 1);
+
+    // Also remove section_subjects mapping
+    let sectionSubjects = db.getTable('section_subjects');
+    sectionSubjects = sectionSubjects.filter(ss => ss.section_id !== sec.id);
+    db.setTable('section_subjects', sectionSubjects);
+
+    db.setTable('sections', sections);
+    res.json({ message: `Section "${sec.section_code}" deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE section (admin only, blocks if has enrolled students)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const sections = db.getTable('sections');
+    const students = db.getTable('students');
+
+    const idx = sections.findIndex(s => s.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Section not found' });
+
+    const sec = sections[idx];
+    const secStudents = students.filter(s => s.section_id === sec.id || s.section === sec.section_code);
+    if (secStudents.length > 0) {
+      return res.status(400).json({ error: `Cannot delete section "${sec.section_code}": it has ${secStudents.length} enrolled student(s). Remove or reassign students first.` });
+    }
+
+    sections.splice(idx, 1);
+    db.setTable('sections', sections);
+
+    // Remove section_subjects mapping
+    let sectionSubjects = db.getTable('section_subjects');
+    sectionSubjects = sectionSubjects.filter(ss => ss.section_id !== sec.id);
+    db.setTable('section_subjects', sectionSubjects);
+
+    res.json({ message: `Section "${sec.section_code}" deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

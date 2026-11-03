@@ -9,7 +9,6 @@ import {
   Sliders,
   FileSpreadsheet, 
   AlertTriangle, 
-  Database,
   Download,
   LogOut,
   History,
@@ -43,9 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'config', label: '6. Academic Configuration', icon: Sliders },
     { id: 'entry', label: '7. Student Academic Records', icon: FileSpreadsheet },
     { id: 'arrears', label: '8. Arrear Management', icon: AlertTriangle },
-    { id: 'common-excel', label: '9. Common Excel', icon: Database },
-    { id: 'section-excel', label: '10. Section Excel', icon: FileSpreadsheet },
-    { id: 'download', label: '11. Excel Download', icon: Download },
+    { id: 'section-excel', label: '9. Section Excel', icon: FileSpreadsheet },
+    { id: 'download', label: '10. Excel Download', icon: Download },
   ];
 
   const secondaryNavItems = [
@@ -126,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition duration-150 cursor-pointer"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
-          <span>13. Logout</span>
+          <span>12. Logout</span>
         </button>
 
         <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[10px] text-slate-500 text-center">

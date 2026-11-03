@@ -13,7 +13,6 @@ import { AcademicConfiguration } from './pages/AcademicConfiguration';
 import { StudentEntry } from './pages/StudentEntry';
 import { ArrearManagement } from './pages/ArrearManagement';
 import { SectionExcelView } from './pages/SectionExcelView';
-import { CommonExcelView } from './pages/CommonExcelView';
 import { AcademicHistory } from './pages/AcademicHistory';
 import { PrintableReport } from './pages/PrintableReport';
 import { AdminUser } from './types';
@@ -136,7 +135,6 @@ export const App: React.FC = () => {
             {activeTab === 'config' && <AcademicConfiguration />}
             {activeTab === 'entry' && <StudentEntry />}
             {activeTab === 'arrears' && <ArrearManagement />}
-            {activeTab === 'common-excel' && <CommonExcelView />}
             {activeTab === 'section-excel' && <SectionExcelView />}
             {activeTab === 'download' && <SectionExcelView />}
             {activeTab === 'history' && <AcademicHistory />}

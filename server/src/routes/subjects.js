@@ -208,6 +208,36 @@ router.patch('/:id/toggle-status', requireAdmin, (req, res) => {
   }
 });
 
+// DELETE subject (admin only, warns if has grade_attempts)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const subjects = db.getTable('subjects');
+    const gradeAttempts = db.getTable('grade_attempts');
+
+    const idx = subjects.findIndex(s => s.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Subject not found' });
+
+    const sub = subjects[idx];
+    const hasGrades = gradeAttempts.some(g => g.subject_id === sub.id || g.subject_code === sub.subject_code);
+    if (hasGrades) {
+      return res.status(400).json({ error: `Cannot delete subject "${sub.subject_code}": it has existing grade records. Deactivate it instead.` });
+    }
+
+    subjects.splice(idx, 1);
+    db.setTable('subjects', subjects);
+
+    // Also remove from section_subjects
+    let sectionSubjects = db.getTable('section_subjects');
+    sectionSubjects = sectionSubjects.filter(ss => ss.subject_id !== sub.id);
+    db.setTable('section_subjects', sectionSubjects);
+
+    res.json({ message: `Subject "${sub.subject_code}" deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Section-specific subject configuration endpoints
 router.get('/section/:section_id', (req, res) => {
   try {
@@ -248,6 +278,36 @@ router.post('/section/:section_id/assign', requireAdmin, (req, res) => {
 
     db.setTable('section_subjects', sectionSubjects);
     res.json({ message: 'Section subjects configured successfully', count: subject_ids.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE subject (admin only, blocks if grade records exist)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const subjects = db.getTable('subjects');
+    const gradeAttempts = db.getTable('grade_attempts');
+
+    const idx = subjects.findIndex(s => s.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Subject not found' });
+
+    const sub = subjects[idx];
+    const hasGrades = gradeAttempts.some(g => g.subject_id === sub.id || g.subject_code === sub.subject_code);
+    if (hasGrades) {
+      return res.status(400).json({ error: `Cannot delete subject "${sub.subject_code}": it has existing grade records. Deactivate it instead.` });
+    }
+
+    subjects.splice(idx, 1);
+    db.setTable('subjects', subjects);
+
+    // Remove from section_subjects
+    let sectionSubjects = db.getTable('section_subjects');
+    sectionSubjects = sectionSubjects.filter(ss => ss.subject_id !== sub.id);
+    db.setTable('section_subjects', sectionSubjects);
+
+    res.json({ message: `Subject "${sub.subject_code}" deleted successfully` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

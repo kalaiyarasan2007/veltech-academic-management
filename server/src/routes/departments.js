@@ -103,4 +103,63 @@ router.patch('/:id/toggle-status', requireAdmin, (req, res) => {
   }
 });
 
+// DELETE department (admin only, blocks if has students)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const departments = db.getTable('departments');
+    const students = db.getTable('students');
+    const sections = db.getTable('sections');
+
+    const idx = departments.findIndex(d => d.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Department not found' });
+
+    const dept = departments[idx];
+    const deptStudents = students.filter(s => s.department_id === dept.id);
+    if (deptStudents.length > 0) {
+      return res.status(400).json({ error: `Cannot delete department "${dept.name}": it has ${deptStudents.length} enrolled student(s). Remove or reassign students first.` });
+    }
+
+    const deptSections = sections.filter(s => s.department_id === dept.id);
+    if (deptSections.length > 0) {
+      return res.status(400).json({ error: `Cannot delete department "${dept.name}": it has ${deptSections.length} section(s). Delete sections first.` });
+    }
+
+    departments.splice(idx, 1);
+    db.setTable('departments', departments);
+    res.json({ message: `Department "${dept.name}" deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE department (admin only, blocks if has sections or students)
+router.delete('/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const departments = db.getTable('departments');
+    const students = db.getTable('students');
+    const sections = db.getTable('sections');
+
+    const idx = departments.findIndex(d => d.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Department not found' });
+
+    const dept = departments[idx];
+    const deptSections = sections.filter(s => s.department_id === dept.id);
+    if (deptSections.length > 0) {
+      return res.status(400).json({ error: `Cannot delete department "${dept.name}": it has ${deptSections.length} section(s). Delete sections first.` });
+    }
+    const deptStudents = students.filter(s => s.department_id === dept.id);
+    if (deptStudents.length > 0) {
+      return res.status(400).json({ error: `Cannot delete department "${dept.name}": it has ${deptStudents.length} enrolled student(s). Remove students first.` });
+    }
+
+    departments.splice(idx, 1);
+    db.setTable('departments', departments);
+    res.json({ message: `Department "${dept.name}" deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
