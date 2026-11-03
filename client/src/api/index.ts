@@ -1,5 +1,12 @@
-export const BACKEND_URL = ((import.meta as any)?.env?.VITE_API_URL || 'https://veltech-academic-management.onrender.com').replace(/\/+$/, '');
-const API_BASE = BACKEND_URL + '/api';
+const envUrl = (import.meta as any)?.env?.VITE_API_URL;
+export const BACKEND_URL = (
+  envUrl !== undefined && envUrl !== ''
+    ? envUrl
+    : (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('vercel.app')
+        ? window.location.origin
+        : 'https://veltech-academic-management.onrender.com')
+).replace(/\/+$/, '');
+const API_BASE = (BACKEND_URL ? BACKEND_URL : '') + '/api';
 
 export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('token');

@@ -9,14 +9,13 @@ import {
   getCollegeExcelPreviewData,
   getCommonExcelPreviewData,
   resolveSectionAndDept,
-  getSectionExcelFilename
+  getSectionExcelFilename,
+  MASTER_TEMPLATE_PATH
 } from '../excelExport.js';
 import { parseAndImportCollegeExcel } from '../excelImport.js';
 import { db } from '../db.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ORIGINAL_MASTER_PATH = path.join(__dirname, '../../../CN-PRJECT  DETSILS.xlsx');
+const ORIGINAL_MASTER_PATH = MASTER_TEMPLATE_PATH;
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });

@@ -1,0 +1,14 @@
+{
+  "name": "veltech-academic-management",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Automated Student Academic, GPA, CGPA and Section-Wise Excel Management System",
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "start": "node server/src/server.js",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev"
+  }
+}
+

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FileSpreadsheet, Download, Eye, RefreshCw, CheckCircle2, AlertCircle, Info, Database } from 'lucide-react';
-import { fetchApi, BACKEND_URL } from '../api';
+import { fetchApi } from '../api';
 import { ExcelViewer } from '../components/ExcelViewer';
+import { triggerCommonExcelDownload } from '../utils/download';
 
 export const CommonExcelView: React.FC = () => {
   const [previewData, setPreviewData] = useState<any>(null);
@@ -32,41 +33,16 @@ export const CommonExcelView: React.FC = () => {
     setMsg('');
     setError('');
 
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${BACKEND_URL}/api/excel/common/export`, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to generate Common Excel export');
+    await triggerCommonExcelDownload(
+      (filename) => {
+        setDownloading(false);
+        setMsg(`✓ ${filename} downloaded successfully. Verified genuine Microsoft Excel workbook.`);
+      },
+      (err) => {
+        setDownloading(false);
+        setError(err || 'Download failed');
       }
-
-      const contentDisposition = res.headers.get('Content-Disposition') || '';
-      let filename = 'Academic_Common_Data.xlsx';
-      const match = contentDisposition.match(/filename="?([^"]+)"?/);
-      if (match && match[1]) {
-        filename = match[1];
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      setMsg(`✓ ${filename} downloaded successfully. Verified genuine Microsoft Excel workbook.`);
-    } catch (err: any) {
-      setError(err.message || 'Download failed');
-    } finally {
-      setDownloading(false);
-    }
+    );
   };
 
   return (
@@ -138,7 +114,7 @@ export const CommonExcelView: React.FC = () => {
             Generating common workbook preview...
           </div>
         ) : previewData ? (
-          <ExcelViewer data={previewData} />
+          <ExcelViewer data={previewData} onDownload={handleDownload} onRefresh={loadPreview} />
         ) : (
           <div className="py-20 text-center text-xs text-slate-400">
             Unable to load preview.

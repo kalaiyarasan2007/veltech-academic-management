@@ -13,16 +13,25 @@ import {
   Download,
   LogOut,
   History,
-  FileText
+  FileText,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  activeTab, 
+  setActiveTab, 
+  onLogout,
+  isMobileOpen = false,
+  onCloseMobile
+}) => {
   // Navigation matching the exact 13 items from specification
   const primaryNavItems = [
     { id: 'dashboard', label: 'Admin Dashboard', icon: LayoutDashboard },
@@ -44,8 +53,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
     { id: 'report', label: 'Printable Transcript', icon: FileText }
   ];
 
-  return (
-    <aside className="w-64 glass-panel border-r border-slate-800 p-4 min-h-[calc(100vh-65px)] flex flex-col justify-between no-print">
+  const handleItemClick = (id: string) => {
+    setActiveTab(id);
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const renderNavContent = () => (
+    <>
       <div className="space-y-4">
         {/* Navigation Section */}
         <div>
@@ -59,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleItemClick(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-xs transition-all duration-150 cursor-pointer ${
                     isActive
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
@@ -86,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleItemClick(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-xs transition-all duration-150 cursor-pointer ${
                     isActive
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
@@ -103,9 +117,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
       </div>
 
       {/* Bottom Section: 13. Logout */}
-      <div className="pt-4 border-t border-slate-800 space-y-2">
+      <div className="pt-4 border-t border-slate-800 space-y-2 mt-4">
         <button
-          onClick={onLogout}
+          onClick={() => {
+            if (onCloseMobile) onCloseMobile();
+            onLogout();
+          }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition duration-150 cursor-pointer"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
@@ -116,6 +133,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
           Admin Portal • v2.0 Section-Wise
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Drawer Backdrop */}
+      {isMobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 md:hidden animate-fadeIn"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Slide-Over Drawer */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-950 border-r border-slate-800 p-4 flex flex-col justify-between transition-transform duration-300 ease-in-out md:hidden no-print overflow-y-auto shadow-2xl ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-800">
+          <span className="text-xs font-bold text-white uppercase tracking-wider">Navigation Menu</span>
+          <button
+            onClick={onCloseMobile}
+            className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        {renderNavContent()}
+      </aside>
+
+      {/* Desktop Persistent Sidebar (Strictly Preserved) */}
+      <aside className="hidden md:flex w-64 glass-panel border-r border-slate-800 p-4 min-h-[calc(100vh-65px)] flex-col justify-between no-print flex-shrink-0">
+        {renderNavContent()}
+      </aside>
+    </>
   );
 };

@@ -69,19 +69,23 @@ export const ExcelViewer: React.FC<ExcelViewerProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onRefresh}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition"
-          >
-            <RefreshCw className="w-3.5 h-3.5" /> Refresh Preview
-          </button>
-          <button
-            onClick={onDownload}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition"
-          >
-            <Download className="w-3.5 h-3.5" /> Download (.xlsx)
-          </button>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh Preview
+            </button>
+          )}
+          {onDownload && (
+            <button
+              onClick={onDownload}
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" /> Download (.xlsx)
+            </button>
+          )}
         </div>
       </div>
 

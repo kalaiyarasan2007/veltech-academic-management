@@ -3,6 +3,7 @@ import { FileSpreadsheet, Download, Eye, Building2, Layers, CheckCircle2, AlertC
 import { Department, Section } from '../types';
 import { fetchApi } from '../api';
 import { ExcelViewer } from '../components/ExcelViewer';
+import { triggerSectionExcelDownload } from '../utils/download';
 
 export const SectionExcelView: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -74,41 +75,18 @@ export const SectionExcelView: React.FC = () => {
     setMsg('');
     setError('');
 
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/excel/section/export?section_id=${selectedSecId}&department_id=${selectedDeptId}`, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to generate Section Excel export');
+    await triggerSectionExcelDownload(
+      selectedSecId,
+      selectedDeptId,
+      (filename) => {
+        setDownloading(false);
+        setMsg(`✓ ${filename} generated and downloaded successfully. Verified genuine Microsoft Excel workbook.`);
+      },
+      (err) => {
+        setDownloading(false);
+        setError(err || 'Download failed');
       }
-
-      const contentDisposition = res.headers.get('Content-Disposition') || '';
-      let filename = 'Section_Academic_Records.xlsx';
-      const match = contentDisposition.match(/filename="?([^"]+)"?/);
-      if (match && match[1]) {
-        filename = match[1];
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      setMsg(`✓ ${filename} generated and downloaded successfully. Verified genuine Microsoft Excel workbook.`);
-    } catch (err: any) {
-      setError(err.message || 'Download failed');
-    } finally {
-      setDownloading(false);
-    }
+    );
   };
 
   const availableSections = sections.filter(s => !selectedDeptId || s.department_id === selectedDeptId);
@@ -225,7 +203,7 @@ export const SectionExcelView: React.FC = () => {
             Generating genuine workbook preview for {activeSection?.section_code}...
           </div>
         ) : previewData ? (
-          <ExcelViewer data={previewData} />
+          <ExcelViewer data={previewData} onDownload={handleDownload} onRefresh={loadPreview} />
         ) : (
           <div className="py-20 text-center text-xs text-slate-400">
             Select a section above to preview its academic records workbook.

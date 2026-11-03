@@ -24,6 +24,7 @@ export const App: React.FC = () => {
   const [tabHistory, setTabHistory] = useState<string[]>(['dashboard']);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Check stored session token on mount
   useEffect(() => {
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
   }, []);
 
   const handleNavigate = (newTab: string) => {
+    setIsMobileMenuOpen(false);
     if (newTab !== activeTab) {
       setTabHistory(prev => [...prev, newTab]);
       setActiveTab(newTab);
@@ -50,6 +52,7 @@ export const App: React.FC = () => {
   };
 
   const handleBack = () => {
+    setIsMobileMenuOpen(false);
     if (tabHistory.length > 1) {
       const newHistory = [...tabHistory];
       newHistory.pop(); // pop current tab
@@ -62,12 +65,14 @@ export const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (user: AdminUser, token: string) => {
+    setIsMobileMenuOpen(false);
     setAdminUser(user);
     setActiveTab('dashboard');
     setTabHistory(['dashboard']);
   };
 
   const handleLogout = () => {
+    setIsMobileMenuOpen(false);
     localStorage.removeItem('token');
     localStorage.removeItem('admin_user');
     setAdminUser(null);
@@ -93,17 +98,21 @@ export const App: React.FC = () => {
       <Navbar 
         adminUser={adminUser} 
         onLogout={handleLogout} 
-        onNavigate={handleNavigate} 
+        onNavigate={handleNavigate}
+        isMobileMenuOpen={isMobileMenuOpen}
+        onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)}
       />
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative overflow-x-hidden">
         <Sidebar 
           activeTab={activeTab} 
           setActiveTab={handleNavigate} 
-          onLogout={handleLogout} 
+          onLogout={handleLogout}
+          isMobileOpen={isMobileMenuOpen}
+          onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-6 overflow-y-auto w-full min-w-0">
           <div className="max-w-7xl mx-auto">
             {/* Top-Left Back Button for all subpages */}
             {activeTab !== 'dashboard' && (

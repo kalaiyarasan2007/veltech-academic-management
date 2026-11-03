@@ -38,9 +38,9 @@ export const SearchableStudentSelect: React.FC<SearchableStudentSelectProps> = (
     }
   }, [value, selectedStudent]);
 
-  // Click outside listener to close dropdown
+  // Click outside listener to close dropdown (handles both mouse and mobile touch events)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         if (selectedStudent) {
@@ -51,7 +51,11 @@ export const SearchableStudentSelect: React.FC<SearchableStudentSelectProps> = (
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, [selectedStudent]);
 
   // Filter students based on search query

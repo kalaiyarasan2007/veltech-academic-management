@@ -9,7 +9,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Primary Source of Truth: Master Template File (never modified)
-const MASTER_TEMPLATE_PATH = path.join(__dirname, '../../CN-PRJECT  DETSILS.xlsx');
+function findMasterTemplate() {
+  const candidates = [
+    path.join(__dirname, '../../CN-PRJECT  DETSILS.xlsx'),
+    path.join(__dirname, '../CN-PRJECT  DETSILS.xlsx'),
+    path.join(__dirname, 'CN-PRJECT  DETSILS.xlsx'),
+    path.join(process.cwd(), 'CN-PRJECT  DETSILS.xlsx'),
+    path.join(process.cwd(), 'server/CN-PRJECT  DETSILS.xlsx')
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return path.join(__dirname, '../../CN-PRJECT  DETSILS.xlsx');
+}
+export const MASTER_TEMPLATE_PATH = findMasterTemplate();
 
 /**
  * Exact semester-to-grade-column mapping from the original Excel (CN-PRJECT  DETSILS.xlsx).
